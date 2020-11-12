@@ -1,0 +1,296 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Kisumu LPDP</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="David Kanyari , https://kendigi.com" />
+    <meta name="keywords" content="Web GIS,Live Map Data Update, Field Data Collection Using Live map, Live Map Update, leaflet-ajax-php-postgis" />
+    <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="images/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <link rel="manifest" href="images/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="images/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="js/bootstrap/css/bootstrap.min.css">
+    <link href='js/leaflet/leaflet.css' rel='stylesheet' />
+    <link href='js/scripts/styles.css' rel='stylesheet' />
+    
+</head>
+<body>
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+
+            <div class="col-sm-8">
+
+
+                <div id="map"></div>
+            </div>
+
+            <div id="sidebar" class="col-sm-4">
+                <img src="images/apple-icon-60x60.png" alt="Kisumu County Logo" style="margin-left: auto;  margin-right: auto;  display: block;" />
+                <h3> Kisumu LPDP Project</h3>
+                <h4>Upload and Edit Data</h4>
+
+                <div id='edit'>
+                    <h5> Data Editing and Updating Section</h5>
+                    <p>
+                        Please select <strong>ONE </strong>layer on the Map Canvas that you wish to edit.An editing form will be shown here for you to fill in details.Please
+                        ensure that you enter meaningful data.Avoid leaving blank fields.Save on data traffic and power by Minimizing selection of layers.We encouarge you to ONLY load the layer you wish to work one.
+                    </p>
+                    <p>
+                        This map has Geolocation enabled.Your location will be tracked for ease of data editing.Please enable <strong>Location</strong> on your device for High accuracy data collection.
+                    </p>
+
+                </div>
+
+                <div id="randomPoint">
+                    <h5>Landuse Point Data </h5>
+                    <p> Use this Form to map landuse for places without Parcel data.You must Click on the Blue Geolocation Marker in the Map Canvas </p>
+
+                    <form action="#" id="pointform">
+
+                        <div class="form-group">
+                            <label for="pt_coord">Point Coordinates (Dont Edit):</label>
+
+                            <input type="hidden" class="form-control" id="pt_coord" placeholder="Coordinates" name="pt_coord" required>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="pt_name">Point Name (Optional):</label>
+                            <input type="text" class="form-control" id="pt_name" placeholder="Point Name" name="pt_name" required>
+
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="pt_landuse">Land Use:*</label>
+                            <select class="form-control" id="pt_landuse" name="pt_landuse" required>
+                                <option value="">Select</option>
+                                <option value="agricultural">Agricultural</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="educational">Educational</option>
+                                <option value="light_industrial"> Light Industrial</option>
+                                <option value="heavy_industrial"> Heavy Industrial</option>
+                                <option value="public_utility">Public Utility</option>
+                                <option value="public_purpose">Public Purpose</option>
+                                <option value="recreational">Recreational</option>
+                                <option value="high_residential">High Density Residential</option>
+                                <option value="medium_residential">Medium Density Residential</option>
+                                <option value="low_residential">Low Density Residential</option>
+                                <option value="transportation">Transportational</option>
+                                <option value="undeveloped">Undeveloped</option>
+                            </select>
+                        </div>
+
+
+                        <button type="button" id="submit_points" class="btn btn-info">Save Point</button>
+                        <div id="pt_error"></div>
+                    </form>
+                </div>
+
+
+
+                <div id="roads">
+                    <h5>Roads</h5>
+                    <p> Mapped  <span style="background-color:#339933"> Mapped </span>  |  Unmapped <span style="background-color: #e6ac00"> Unmapped </span></p>
+
+                    <form action="#" id="roadform">
+                        <div class="form-group">
+                            <label for="road_id">Road ID*:</label>
+                            <input type="hidden" class="form-control" id="road_id" placeholder="Road ID" name="road_id" required>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="roadname">Road Name*:</label>
+                            <input type="text" class="form-control" id="roadname" placeholder="Road Name" name="roadname" required>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="surfacetype">Select SurfaceType:*</label>
+                            <select class="form-control" id="surfacetype" name="surfacetype" required>
+                                <option value="">Select</option>
+                                <option value="paved">Paved(Tarmac,Cabro,Concrete)</option>
+                                <option value="gravel">Gravel(Murram)</option>
+                                <option value="earth">Earth</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="condition">Select Condition:*</label>
+                            <select class="form-control" id="condition" name="condition" required>
+                                <option value="">Select</option>
+                                <option value="good">Good</option>
+                                <option value="fair">Fair</option>
+                                <option value="poor">Poor</option>
+
+                            </select>
+
+                        </div>
+
+                        <button type="button" id="submit_roads" class="btn btn-info">Update Road</button>
+                        <div id="road_error"></div>
+                    </form>
+                </div>
+                <div id="buildings">
+                    <h5>Buildings</h5>
+                    <p> Mapped  <span style="background-color:#408000"> Mapped </span>  |  Unmapped <span style="background-color: #7a7a52"> Unmapped </span></p>
+
+                    <form id="bldform" action="#">
+                        <div class="form-group">
+                            <label for="bld_id">Building ID:*</label>
+                            <input type="hidden" class="form-control" id="bld_id" placeholder="Building ID" name="bld_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bldname">Identity(Name):</label>
+                            <input type="text" class="form-control" id="bldname" placeholder="Building Name" name="bldname">
+                        </div>
+                        <div class="form-group">
+                            <label for="wallmat">Wall Material*</label>
+                            <select class="form-control" id="wallmat" name="wallmat" required>
+                                <option value="">Select</option>
+                                <option value="stone">Stone</option>
+                                <option value="wood">Wood</option>
+                                <option value="concrete">Concrete</option>
+                                <option value="iron_sheets">Iron Sheets</option>
+                                <option value="earth">Earth</option>
+                                <option value="other">Other</option>
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="roofmat">Roof Material*</label>
+                            <select class="form-control" id="roofmat" name="roofmat" required>
+                                <option value="">Select</option>
+                                <option value="stone">Stone</option>
+                                <option value="tiles">Tiles</option>
+                                <option value="concrete">Concrete</option>
+                                <option value="iron_sheets">Iron Sheets</option>
+                                <option value="other">Other</option>
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="floors">Floors*</label>
+
+                            <input type="number" class="form-control" id="floors" placeholder="E.g 1,2" name="floors" min="1" max="30" required>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="occupancy">Occupancy:*</label>
+                            <select class="form-control" id="occupancy" name="occupancy" required>
+                                <option value="">Select</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="abandoned">Abandoned</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="typology">Typology:*</label>
+                            <select class="form-control" id="typology" name="typology" required>
+                                <option value="">Select</option>
+                                <option value="bungalow">Bungalow</option>
+                                <option value="flat">Flat</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+
+
+                        <button type="button" id="submit_buildings" class="btn btn-info">Update Building</button>
+                        <div id="bld_error"></div>
+                    </form>
+                </div>
+
+
+                <div id="cadastre">
+                    <h5>Parcels</h5>
+                    <p> Mapped  <span style="background-color:#264d00"> Mapped </span>  |  Unmapped <span style="background-color: #7a7a52"> Unmapped </span></p>
+
+                    <form id="parcelform" action="#">
+                        <div class="form-group">
+                            <label for="parcel_id">Parcel ID:*</label>
+                            <input type="hidden" class="form-control" id="parcel_id" placeholder="Parcel ID" name="parcel_id" required>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="p_occupancy">Occupancy:*</label>
+                            <select class="form-control" id="p_occupancy" name="p_occupancy" required>
+                                <option value="">Select</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="abandoned">Abandoned</option>
+
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="landuse">Land Use:*</label>
+                            <select class="form-control" id="landuse" name="landuse" required>
+                                <option value="">Select</option>
+                                <option value="agricultural">Agricultural</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="educational">Educational</option>
+                                <option value="light_industrial"> Light Industrial</option>
+                                <option value="heavy_industrial"> Heavy Industrial</option>
+                                <option value="public_utility">Public Utility</option>
+                                <option value="public_purpose">Public Purpose</option>
+                                <option value="recreational">Recreational</option>
+                                <option value="high_residential">High Density Residential</option>
+                                <option value="medium_residential">Medium Density Residential</option>
+                                <option value="low_residential">Low Density Residential</option>
+                                <option value="transportation">Transportational</option>
+                                <option value="undeveloped">Undeveloped</option>
+                            </select>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="electricity" id="electricity" name="electricity">Electricity</label>
+                        </div>
+
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="water" id="water" name="water">Water</label>
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="sewage" id="sewage" name="sewage">Sewage</label>
+                        </div>
+                        <button type="button" id="submit_parcels" class="btn btn-info">Submit</button>
+                        <div id="parcel_error"></div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container">
+            <p class="text-muted">Designed by <a href="http://branded.co.ke/about-us">Branded Solutions Ltd</a> &copy; 2019 </p>
+        </div>
+    </footer>
+
+    <script src="js/jquery/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap/js/bootstrap.min.js"></script>
+    <script src='js/leaflet/leaflet.js'></script>
+    <script src='js/scripts/mapping.js'></script>
+    <script src='js/scripts/forms_validate.js'></script>
+  
+</body>
+</html>

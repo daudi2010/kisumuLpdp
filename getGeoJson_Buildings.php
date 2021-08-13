@@ -1,7 +1,7 @@
 <?php
 
 # Connect to PostgreSQL database
-$conn = new PDO('pgsql:host=localhost;dbname=kisumu_lpdp','postgres','postgres');
+$conn = new PDO('pgsql:host=localhost;dbname=db','youruser','youruserpw');
 # Build SQL SELECT statement and return the geometry as a GeoJSON element
 $sql = 'SELECT *, public.ST_AsGeoJSON(public.ST_Transform((geom),4326),6) AS geojson FROM lpdp1."buildings"';
 
